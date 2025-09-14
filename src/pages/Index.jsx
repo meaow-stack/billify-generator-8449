@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatCurrency } from '../utils/formatCurrency'; // Corrected import path
+import { formatCurrency } from '../utils/formatCurrency';
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import BillToSection from '../components/BillToSection';
 import ShipToSection from '../components/ShipToSection';
 import ItemDetails from "../components/ItemDetails";
 import { templates } from "../utils/templateRegistry";
-import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; // Added FiTrash2 icon
-import { RefreshCw } from "lucide-react";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi";
+import { RefreshCw, Palette } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { set, sub } from "date-fns";
 
 const generateRandomInvoiceNumber = () => {
@@ -307,49 +311,72 @@ const Index = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 relative">
-      <h1 className="text-3xl font-bold mb-8 text-center">Bill Generator</h1>
-      <div className="fixed top-4 left-4 flex gap-2">
-        <button
-          onClick={clearForm}
-          className="bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600"
-          aria-label="Clear Form"
-        >
-          <FiTrash2 size={24} />
-        </button>
-        <button
-          onClick={fillDummyData}
-          className="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600"
-          aria-label="Fill with Dummy Data"
-        >
-          <FiEdit size={24} />
-        </button>
-      </div>
-      <button
-        onClick={() =>
-          navigate("/receipt", {
-            state: {
-              formData: {
-                billTo,
-                shipTo,
-                invoice,
-                yourCompany,
-                items,
-                taxPercentage,
-                notes,
-                selectedCurrency, // Ensure this is passed
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
+      <div className="container mx-auto px-4 py-8 relative">
+        {/* Modern Header with Theme Toggle */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center">
+              <Palette className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                Bill Generator
+              </h1>
+              <p className="text-muted-foreground">Create professional invoices in seconds</p>
+            </div>
+          </div>
+          <ThemeToggle />
+        </div>
+
+        {/* Modern Action Buttons */}
+        <div className="fixed top-6 left-6 flex flex-col gap-3 z-50">
+          <Button
+            onClick={clearForm}
+            variant="destructive"
+            size="icon"
+            className="h-12 w-12 rounded-full shadow-lg hover:scale-105 transition-transform"
+            aria-label="Clear Form"
+          >
+            <FiTrash2 size={20} />
+          </Button>
+          <Button
+            onClick={fillDummyData}
+            className="h-12 w-12 rounded-full shadow-lg hover:scale-105 transition-transform bg-gradient-primary"
+            size="icon"
+            aria-label="Fill with Dummy Data"
+          >
+            <FiEdit size={20} />
+          </Button>
+        </div>
+
+        <Button
+          onClick={() =>
+            navigate("/receipt", {
+              state: {
+                formData: {
+                  billTo,
+                  shipTo,
+                  invoice,
+                  yourCompany,
+                  items,
+                  taxPercentage,
+                  notes,
+                  selectedCurrency,
+                },
               },
-            },
-          })
-        }
-        className="fixed top-4 right-4 bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-600"
-        aria-label="Switch to Receipt"
-      >
-        <FiFileText size={24} />
-      </button>
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
-          <form>
+            })
+          }
+          className="fixed top-6 right-6 h-12 w-12 rounded-full shadow-lg hover:scale-105 transition-transform bg-success z-50"
+          size="icon"
+          aria-label="Switch to Receipt"
+        >
+          <FiFileText size={20} />
+        </Button>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <Card className="w-full lg:w-1/2 card-modern">
+            <CardContent className="p-6">
+              <form>
             <BillToSection
               billTo={billTo}
               handleInputChange={handleInputChange(setBillTo)}
@@ -457,55 +484,68 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="mb-6">
-              <div className="flex items-center mb-2">
-                <h3 className="text-lg font-medium">Notes</h3>
-                <button
-                  type="button"
-                  onClick={refreshNotes}
-                  className="ml-2 p-1 rounded-full hover:bg-gray-200"
-                  title="Refresh Notes"
-                >
-                  <RefreshCw size={16} />
-                </button>
-              </div>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full p-2 border rounded"
-                rows="4"
-              ></textarea>
-            </div>
-
-            {/* Clear Form button removed */}
-          </form>
-        </div>
-
-        <div
-          className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md overflow-y-auto"
-          // style={{ maxHeight: "calc(100vh - 2rem)" }}
-        >
-          <h2 className="text-2xl font-semibold mb-4">Template Gallery</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {templates.map((template, index) => (
-              <div
-                key={index}
-                className="template-card bg-gray-100 p-4 rounded-lg cursor-pointer hover:shadow-lg transition-shadow duration-300"
-                onClick={() => handleTemplateClick(index + 1)}
-              >
-                <img
-                  src={`/assets/template${index + 1}-preview.png`}
-                  alt={template.name}
-                  className={`w-full ${
-                    template.name === "Template 10"
-                      ? "h-[38px] w-[57px]"
-                      : "h-50"
-                  } object-cover rounded mb-2`}
+              <div className="mb-6">
+                <div className="flex items-center mb-4">
+                  <h3 className="text-lg font-semibold">Notes</h3>
+                  <Button
+                    type="button"
+                    onClick={refreshNotes}
+                    variant="ghost"
+                    size="sm"
+                    className="ml-2 h-8 w-8 p-0"
+                    title="Refresh Notes"
+                  >
+                    <RefreshCw size={16} />
+                  </Button>
+                </div>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="input-modern min-h-[100px] resize-none"
+                  rows="4"
+                  placeholder="Add notes for your invoice..."
                 />
-                <p className="text-center font-medium">{template.name}</p>
               </div>
-            ))}
-          </div>
+            </form>
+            </CardContent>
+          </Card>
+
+          <Card className="w-full lg:w-1/2 card-modern">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5 text-primary" />
+                Template Gallery
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Choose from our collection of professional templates
+              </p>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto">
+                {templates.map((template, index) => (
+                  <div
+                    key={index}
+                    className="group relative bg-gradient-to-br from-card to-secondary/20 p-4 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border border-border/50"
+                    onClick={() => handleTemplateClick(index + 1)}
+                  >
+                    <div className="relative overflow-hidden rounded-lg mb-3">
+                      <img
+                        src={`/assets/template${index + 1}-preview.png`}
+                        alt={template.name}
+                        className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+                        <Badge className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary text-primary-foreground">
+                          Select
+                        </Badge>
+                      </div>
+                    </div>
+                    <p className="text-center font-medium text-sm">{template.name}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
