@@ -78,18 +78,19 @@ A modern, responsive **Bill / Invoice Generator** built using React. This applic
 
 ## 📂 Project Structure
 
+```
 src/
 │── components/
-│ ├── InvoiceForm
-│ ├── ItemList
-│ ├── TemplateGallery
-│ ├── Totals
+│   ├── InvoiceForm
+│   ├── ItemList
+│   ├── TemplateGallery
+│   ├── Totals
 │
 │── pages/
 │── utils/
 │── App.js
 │── index.js
-
+```
 ---
 
 ## ⚙️ Installation & Setup
